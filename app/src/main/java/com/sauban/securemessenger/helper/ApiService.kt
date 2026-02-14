@@ -8,8 +8,9 @@ data class LoginRequest(val phoneNumber: String, val password: String)
 data class SignupRequest(val phoneNumber: String, val password: String, val name: String)
 data class LoginResponse(val token: String, val user: User)
 data class User(val name: String, val id: String, val phoneNumber: String)
-data class UserInfoResponse(val name: String, val id: String, val phoneNumber: String)
+data class UserInfoResponse(val user: User)
 data class SignupResponse(val user: User)
+data class UsersResponse(val users: List<User>)
 data class UserResponse(val id: String, val name: String, val phoneNumber: String)
 data class ConversationResponse(val id: String, val messages: List<String>)
 data class UpdateRequest(val name: String)
@@ -25,7 +26,7 @@ interface ApiService {
     suspend fun getUserInfo(): UserInfoResponse
 
     @GET("user")
-    suspend fun getUser(): UserResponse
+    suspend fun getUser(): UsersResponse
 
     @GET("conversation")
     suspend fun getConversations(): List<ConversationResponse>

@@ -20,18 +20,46 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            fun secret(name: String): String? =
+                providers
+                    .gradleProperty(name)
+                    .orElse(providers.environmentVariable(name))
+                    .orNull
+
+            val storeFilePath = secret("RELEASE_STORE_FILE")
+            if (!storeFilePath.isNullOrBlank()) {
+                storeFile = file(storeFilePath)
+                storePassword = secret("RELEASE_STORE_PASSWORD")
+                keyAlias = secret("RELEASE_KEY_ALIAS")
+                keyPassword = secret("RELEASE_KEY_PASSWORD")
+                storeType = secret("RELEASE_STORE_TYPE") ?: "PKCS12"
+            } else {
+                logger.warn("RELEASE_STORE_FILE not found. Release signing is disabled.")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("release").takeIf { it.storeFile != null }
+        }
+        debug {
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
@@ -75,6 +103,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha03")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.json:json:20230227")
+    implementation("com.google.errorprone:error_prone_annotations:2.21.1")
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
