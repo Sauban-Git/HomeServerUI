@@ -121,11 +121,9 @@ fun HomeScreen(navController: NavController) {
                             storeToken(context, response.token)
                             // Also set in ApiClient so all future calls use it automatically
                             ApiClient.setToken(response.token)
-
                             navController.navigate("ConversationScreen")
                         } catch (e: Exception) {
                             snackbarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
-                            println(e)
                         }
                     }
 
