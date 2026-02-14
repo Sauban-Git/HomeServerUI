@@ -5,7 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.sauban.securemessenger.data.Conversation
+import com.sauban.securemessenger.model.Conversation
 
 @Composable
 fun ConversationList(conversations: List<Conversation>, paddingValues: PaddingValues) {

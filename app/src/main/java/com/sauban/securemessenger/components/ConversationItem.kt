@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sauban.securemessenger.data.Conversation
+import com.sauban.securemessenger.model.Conversation
 import com.sauban.securemessenger.helper.formatTime
 
 @Composable

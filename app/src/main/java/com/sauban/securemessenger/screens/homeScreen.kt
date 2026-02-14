@@ -17,6 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -26,26 +29,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.sauban.securemessenger.helper.LoginRequest
+import com.sauban.securemessenger.helper.storeToken
+import com.sauban.securemessenger.network.ApiClient
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     var phoneNumber by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Secure Messenger") }
+                title = { Text("Secure Messenger") },
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
 
         Column(
@@ -62,10 +73,19 @@ fun HomeScreen(navController: NavController) {
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Your Name") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = password,
@@ -94,8 +114,22 @@ fun HomeScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                        navController.navigate("ConversationScreen")
-                }
+                    scope.launch {
+                        try {
+                            val response =
+                                ApiClient.apiService.login(LoginRequest(phoneNumber, password))
+                            // Store token securely
+                            storeToken(context, response.token)
+                            // Also set in ApiClient so all future calls use it automatically
+                            ApiClient.setToken(response.token)
+
+                            navController.navigate("ConversationScreen")
+                        } catch (e: Exception) {
+                            snackbarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
+                        }
+                    }
+
+                },
             ) {
                 Text("Click!")
             }

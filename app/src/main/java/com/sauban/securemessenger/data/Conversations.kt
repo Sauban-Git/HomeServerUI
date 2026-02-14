@@ -1,4 +1,4 @@
-package com.sauban.securemessenger.data
+package com.sauban.securemessenger.model
 
 data class Conversation(
     val id: Int,
@@ -15,3 +15,13 @@ val conversations = List(50) { index ->
         lastMessageTime = System.currentTimeMillis() - (index * 60 * 1000L)
     )
 }
+
+data class ChatMessage(
+    val message: String,
+    val isMine: Boolean
+)
+data class EncryptedPayload(
+    val msg: String,
+    val iv: String,
+    val senderId: String
+)
