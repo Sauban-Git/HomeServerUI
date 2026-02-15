@@ -19,3 +19,26 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep generic signatures (CRITICAL for Retrofit)
+-keepattributes Signature
+
+# Keep annotations
+-keepattributes *Annotation*
+
+# Keep Retrofit interfaces
+-keep interface retrofit2.** { *; }
+-keep class retrofit2.** { *; }
+
+# Keep your API models
+-keep class com.sauban.securemessenger.helper.** { *; }
+
+# Keep Kotlin metadata
+-keep class kotlin.Metadata { *; }
+
+# Keep coroutines
+-keep class kotlinx.coroutines.** { *; }
+
+# Gson specific
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
