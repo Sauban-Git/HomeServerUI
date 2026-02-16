@@ -36,7 +36,7 @@ fun ChatScreen() {
         SocketManager.init(token)
 
         // 3️⃣ Join room
-        SocketManager.joinRoom(roomId)
+//        SocketManager.joinRoom(roomId)
 
         // 4️⃣ Register public key
         SocketManager.registerPublicKey(
@@ -44,32 +44,32 @@ fun ChatScreen() {
         )
 
         // 5️⃣ Fetch peer public key and derive session key
-        SocketManager.getPublicKey(peerUserId) { peerKey ->
-
-            val sharedSecret =
-                CryptoManager.deriveSharedSecret(peerKey)
-
-            sessionKey =
-                CryptoManager.hkdf(sharedSecret)
-        }
+//        SocketManager.getPublicKey(peerUserId) { peerKey ->
+//
+//            val sharedSecret =
+//                CryptoManager.deriveSharedSecret(peerKey)
+//
+//            sessionKey =
+//                CryptoManager.hkdf(sharedSecret)
+//        }
 
         // 6️⃣ Listen for new messages
-        SocketManager.onNewMessage { payload ->
-
-            sessionKey?.let { key ->
-
-                val decrypted =
-                    CryptoManager.decryptMessage(
-                        key,
-                        payload.msg,
-                        payload.iv
-                    )
-
-                messages.add(
-                    ChatMessage(decrypted, isMine = false)
-                )
-            }
-        }
+//        SocketManager.onNewMessage { payload ->
+//
+//            sessionKey?.let { key ->
+//
+//                val decrypted =
+//                    CryptoManager.decryptMessage(
+//                        key,
+//                        payload.msg,
+//                        payload.iv
+//                    )
+//
+//                messages.add(
+//                    ChatMessage(decrypted, isMine = false)
+//                )
+//            }
+//        }
     }
 
     Scaffold(

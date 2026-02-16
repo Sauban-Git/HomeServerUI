@@ -25,6 +25,7 @@ import com.sauban.securemessenger.network.ApiClient
 import com.sauban.securemessenger.screens.ChatScreen
 import com.sauban.securemessenger.screens.ConversationScreen
 import com.sauban.securemessenger.screens.HomeScreen
+import com.sauban.securemessenger.screens.SignupScreen
 import com.sauban.securemessenger.ui.theme.SecureMessengerTheme
 
 class MainActivity : ComponentActivity() {
@@ -55,6 +56,9 @@ fun AppNavigation() {
             composable("ConversationScreen") {
                 ChatScreen()
             }
+            composable("SignupScreen") {
+                SignupScreen(navController)
+            }
         }
     }
 
@@ -71,7 +75,7 @@ fun SplashScreen(navController: NavController) {
         val token = getToken(context)
 
         if (token.isNullOrEmpty()) {
-            navController.navigate("Home") {
+            navController.navigate("SignupScreen") {
                 popUpTo("Splash") { inclusive = true }
             }
         } else {

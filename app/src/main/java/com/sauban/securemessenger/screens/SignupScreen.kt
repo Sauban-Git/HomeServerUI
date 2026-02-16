@@ -35,14 +35,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.sauban.securemessenger.helper.CryptoManager
-import com.sauban.securemessenger.helper.LoginRequest
-import com.sauban.securemessenger.helper.storeToken
+import com.sauban.securemessenger.helper.SignupRequest
 import com.sauban.securemessenger.network.ApiClient
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun SignupScreen(navController: NavController) {
     var phoneNumber by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -56,7 +55,7 @@ fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Sign in securely") },
+                title = { Text("Register here") },
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -117,24 +116,37 @@ fun HomeScreen(navController: NavController) {
 
             Button(
                 onClick = {
+                    if(phoneNumber.length < 10 || password.length < 5) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Invalid Number or weak password!")
+                        }
+                        return@Button
+                    }
 
                     scope.launch {
                         try {
                             val response =
-                                ApiClient.apiService.login(LoginRequest(phoneNumber, password, publicKey))
-                            // Store token securely
-                            storeToken(context, response.token)
-                            // Also set in ApiClient so all future calls use it automatically
-                            ApiClient.setToken(response.token)
-                            navController.navigate("ConversationScreen")
+                                ApiClient.apiService.signup(SignupRequest(phoneNumber, password, name))
+                            if (response.user != null) {
+                                navController.navigate("Home")
+                            } else {
+                                snackbarHostState.showSnackbar("SignUp failed! Try again later")
+                            }
                         } catch (e: Exception) {
-                            snackbarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
+                            snackbarHostState.showSnackbar("Signup Error: ${e.message ?: "Unknown error"}")
                         }
                     }
 
                 },
             ) {
-                Text("Click!")
+                Text("Register!")
+            }
+            Button(
+                onClick = {
+                    navController.navigate("Home")
+                }
+            ) {
+                Text("Already registered? Login")
             }
         }
     }

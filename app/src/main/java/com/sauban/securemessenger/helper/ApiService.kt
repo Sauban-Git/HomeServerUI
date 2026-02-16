@@ -4,12 +4,12 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-data class LoginRequest(val phoneNumber: String, val password: String)
+data class LoginRequest(val phoneNumber: String, val password: String, val publicKey: String)
 data class SignupRequest(val phoneNumber: String, val password: String, val name: String)
 data class LoginResponse(val token: String, val user: User)
 data class User(val name: String, val id: String, val phoneNumber: String)
 data class UserInfoResponse(val user: User)
-data class SignupResponse(val user: User)
+data class SignupResponse(val user: User?, val error: String?)
 data class UsersResponse(val users: List<User>)
 data class UserResponse(val id: String, val name: String, val phoneNumber: String)
 data class ConversationResponse(val id: String, val messages: List<String>)
