@@ -1,20 +1,20 @@
 package com.sauban.securemessenger.model
 
-data class Conversation(
-    val id: Int,
+data class  Conversation(
+    val participants: List<Participants>,
     val name: String,
-    val lastMessage: String,
-    val lastMessageTime: Long // epoch millis
+    val id: String,
+    val createdAt: String,
+    val updatedAt: String,
+    val isGroup: Boolean,
 )
 
-val conversations = List(50) { index ->
-    Conversation(
-        id = index,
-        name = "Contact ${index + 1}",
-        lastMessage = "Last message from Contact ${index + 1}",
-        lastMessageTime = System.currentTimeMillis() - (index * 60 * 1000L)
-    )
-}
+data class Participants(
+    val id: String,
+    val userId : String,
+    val conversationId: String,
+    val role: String,
+)
 
 data class ChatMessage(
     val message: String,

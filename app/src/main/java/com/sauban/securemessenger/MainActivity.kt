@@ -54,7 +54,7 @@ fun AppNavigation() {
                 SplashScreen(navController)
             }
             composable("ConversationScreen") {
-                ChatScreen()
+                ConversationScreen()
             }
             composable("SignupScreen") {
                 SignupScreen(navController)
@@ -92,7 +92,7 @@ fun SplashScreen(navController: NavController) {
 
             } catch (e: Exception) {
                 // Token invalid
-                navController.navigate("Home") {
+                navController.navigate("SignupScreen") {
                     popUpTo("Splash") { inclusive = true }
                 }
             }

@@ -136,6 +136,13 @@ fun HomeScreen(navController: NavController) {
             ) {
                 Text("Click!")
             }
+            Button(
+                onClick = {
+                    navController.navigate("SignupScreen")
+                }
+            ) {
+                Text("New here? Signup")
+            }
         }
     }
 }
