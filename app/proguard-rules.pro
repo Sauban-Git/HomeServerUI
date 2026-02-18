@@ -1,44 +1,55 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+##############################
+# RETROFIT
+##############################
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep Retrofit interfaces (HTTP annotations)
+-keep interface * {
+    @retrofit2.http.* <methods>;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-
-# Keep generic signatures (CRITICAL for Retrofit)
+# Keep generic type signatures (VERY IMPORTANT)
 -keepattributes Signature
+-keepattributes Exceptions
 
-# Keep annotations
--keepattributes *Annotation*
+##############################
+# GSON
+##############################
 
-# Keep Retrofit interfaces
--keep interface retrofit2.** { *; }
--keep class retrofit2.** { *; }
+# Keep Gson annotated fields
+-keepclassmembers,allowobfuscation class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 
-# Keep your API models
--keep class com.sauban.securemessenger.helper.** { *; }
+# Keep all model/data classes in your app
+-keep class com.sauban.securemessenger.** { *; }
 
-# Keep Kotlin metadata
+##############################
+# OKHTTP
+##############################
+
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+##############################
+# KOTLIN
+##############################
+
 -keep class kotlin.Metadata { *; }
 
-# Keep coroutines
--keep class kotlinx.coroutines.** { *; }
+##############################
+# PARCELABLE
+##############################
 
-# Gson specific
--keep class com.google.gson.** { *; }
--dontwarn com.google.gson.**
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
+
+##############################
+# ENUM SAFETY
+##############################
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
