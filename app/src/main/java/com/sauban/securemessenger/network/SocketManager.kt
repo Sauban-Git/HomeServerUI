@@ -74,9 +74,20 @@ object SocketManager {
                     senderId = data.getString("senderId")
                 ),
             )
-        }
+         }
     }
 
+    fun createConversation(userB: String, callback: (JSONObject?) -> Unit) {
+        val payload = JSONObject().apply {
+            put("userB", userB)
+        }
+
+        mSocket?.emit("conversation:new", payload, Ack { args ->
+            // Server sends: callback({ conversation })
+            val response = args.getOrNull(0) as? JSONObject
+            callback(response)
+        })
+    }
 
     fun registerPublicKey(publicKey: String) {
         val payload = JSONObject()

@@ -1,8 +1,10 @@
 package com.sauban.securemessenger.model
 
+import com.sauban.securemessenger.helper.User
+
 data class  Conversation(
     val participants: List<Participants>,
-    val name: String,
+    val name: String?,
     val id: String,
     val createdAt: String,
     val updatedAt: String,
@@ -14,6 +16,7 @@ data class Participants(
     val userId : String,
     val conversationId: String,
     val role: String,
+    val user: User
 )
 
 data class ChatMessage(

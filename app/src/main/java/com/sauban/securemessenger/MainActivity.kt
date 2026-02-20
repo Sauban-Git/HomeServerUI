@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sauban.securemessenger.helper.getToken
 import com.sauban.securemessenger.network.ApiClient
-import com.sauban.securemessenger.screens.ChatScreen
+import com.sauban.securemessenger.network.SocketManager
 import com.sauban.securemessenger.screens.ConversationScreen
 import com.sauban.securemessenger.screens.HomeScreen
 import com.sauban.securemessenger.screens.SignupScreen
@@ -80,6 +80,7 @@ fun SplashScreen(navController: NavController) {
             }
         } else {
             try {
+                SocketManager.init(token)
                 ApiClient.setToken(token)
 
                 // Call protected endpoint to verify token

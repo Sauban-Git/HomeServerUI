@@ -1,5 +1,6 @@
 package com.sauban.securemessenger.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.sauban.securemessenger.helper.CryptoManager
 import com.sauban.securemessenger.helper.LoginRequest
+import com.sauban.securemessenger.helper.UserSession
 import com.sauban.securemessenger.helper.storeToken
 import com.sauban.securemessenger.network.ApiClient
 import kotlinx.coroutines.launch
@@ -49,7 +51,7 @@ fun HomeScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     // 1️⃣ Generate identity key once
     CryptoManager.generateIdentityKeyIfNeeded()
     val publicKey = CryptoManager.getPublicKeyBase64()
@@ -59,7 +61,7 @@ fun HomeScreen(navController: NavController) {
                 title = { Text("Sign in securely") },
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
     ) { paddingValues ->
 
         Column(
@@ -126,9 +128,10 @@ fun HomeScreen(navController: NavController) {
                             storeToken(context, response.token)
                             // Also set in ApiClient so all future calls use it automatically
                             ApiClient.setToken(response.token)
+                            UserSession.saveUser(this as Context, response.user.id, response.user.name, response.user.phoneNumber)
                             navController.navigate("ConversationScreen")
                         } catch (e: Exception) {
-                            snackbarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
+                            snackBarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
                         }
                     }
 
