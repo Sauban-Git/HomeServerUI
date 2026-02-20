@@ -16,13 +16,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.sauban.securemessenger.helper.getToken
+import com.sauban.securemessenger.model.ChatViewModel
+import com.sauban.securemessenger.model.Conversation
 import com.sauban.securemessenger.network.ApiClient
 import com.sauban.securemessenger.network.SocketManager
+import com.sauban.securemessenger.screens.ChatScreen
 import com.sauban.securemessenger.screens.ConversationScreen
 import com.sauban.securemessenger.screens.HomeScreen
 import com.sauban.securemessenger.screens.SignupScreen
@@ -46,7 +52,11 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     Surface(color = MaterialTheme.colorScheme.background) {
-        NavHost(navController = navController, startDestination = "Splash", modifier = Modifier.fillMaxSize()) {
+        NavHost(
+            navController = navController,
+            startDestination = "Splash",
+            modifier = Modifier.fillMaxSize(),
+        ) {
             composable("Home") {
                 HomeScreen(navController = navController)
             }
@@ -54,10 +64,19 @@ fun AppNavigation() {
                 SplashScreen(navController)
             }
             composable("ConversationScreen") {
-                ConversationScreen()
+                ConversationScreen(navController)
             }
             composable("SignupScreen") {
                 SignupScreen(navController)
+            }
+            composable(
+                route = "chat/{conversationId}",
+                arguments = listOf(navArgument("conversationId") { type = NavType.StringType }),
+            ) { backStackEntry ->
+
+                val conversationId = backStackEntry.arguments?.getString("conversationId")!!
+                val viewModel: ChatViewModel = viewModel()
+                ChatScreen(conversationId, viewModel)
             }
         }
     }
@@ -103,11 +122,11 @@ fun SplashScreen(navController: NavController) {
     // Simple loading UI (replace with animation if you want)
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
         }

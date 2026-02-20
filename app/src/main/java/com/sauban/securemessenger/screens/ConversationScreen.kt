@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.sauban.securemessenger.components.ConversationList
 import com.sauban.securemessenger.components.UsersList
 import com.sauban.securemessenger.helper.User
@@ -25,7 +26,7 @@ import com.sauban.securemessenger.network.ApiClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationScreen() {
+fun ConversationScreen(navController: NavController) {
 
     var conversations by remember { mutableStateOf<List<Conversation>>(emptyList()) }
     var users by remember { mutableStateOf<List<User>>(emptyList()) }
@@ -54,6 +55,7 @@ fun ConversationScreen() {
                 Text("No conversation yet")
             } else {
                 ConversationList(
+                    navController = navController,
                     conversations = conversations,
                     paddingValues = PaddingValues(0.dp),
                     snackBarHostState

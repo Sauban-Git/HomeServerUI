@@ -53,11 +53,11 @@ object SocketManager {
 
     // Send a new encrypted message
     fun sendMessage(roomId: String, msg: String, iv: String) {
-        val payload = mutableMapOf(
-            "roomId" to roomId,
-            "msg" to msg,
-            "iv" to iv
-        )
+        val payload = JSONObject().apply {
+            put("roomId", roomId)
+            put("msg", msg)
+            put("iv", iv)
+        }
 
         mSocket?.emit("message:new", payload)
     }
@@ -71,10 +71,10 @@ object SocketManager {
                 EncryptedPayload(
                     msg = data.getString("msg"),
                     iv = data.getString("iv"),
-                    senderId = data.getString("senderId")
+                    senderId = data.getString("senderId"),
                 ),
             )
-         }
+        }
     }
 
     fun createConversation(userB: String, callback: (JSONObject?) -> Unit) {
@@ -82,11 +82,14 @@ object SocketManager {
             put("userB", userB)
         }
 
-        mSocket?.emit("conversation:new", payload, Ack { args ->
-            // Server sends: callback({ conversation })
-            val response = args.getOrNull(0) as? JSONObject
-            callback(response)
-        })
+        mSocket?.emit(
+            "conversation:new", payload,
+            Ack { args ->
+                // Server sends: callback({ conversation })
+                val response = args.getOrNull(0) as? JSONObject
+                callback(response)
+            },
+        )
     }
 
     fun registerPublicKey(publicKey: String) {
@@ -95,15 +98,19 @@ object SocketManager {
 
         mSocket?.emit("e2ee:register-key", payload)
     }
-    fun getPublicKey(userId: String, callback: (String?) -> Unit) {
+
+    fun getPublicKey(userId: String?, callback: (String?) -> Unit) {
+        if (userId == null) return
         val payload = JSONObject().put("userId", userId)
+        mSocket?.emit(
+            "e2ee:get-key", payload,
+            Ack { args ->
 
-        mSocket?.emit("e2ee:get-key", payload, Ack { args ->
+                val key = args.getOrNull(0) as? String
+                callback(key)
 
-            val key = args.getOrNull(0) as? String
-            callback(key)
-
-        })
+            },
+        )
     }
 
     fun disconnect() {

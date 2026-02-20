@@ -1,6 +1,12 @@
 package com.sauban.securemessenger.model
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.sauban.securemessenger.helper.User
+import com.sauban.securemessenger.network.ApiClient
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 data class  Conversation(
     val participants: List<Participants>,
@@ -10,6 +16,21 @@ data class  Conversation(
     val updatedAt: String,
     val isGroup: Boolean,
 )
+
+class ChatViewModel : ViewModel() {
+
+    private val _conversation = MutableStateFlow<Conversation?>(null)
+    val conversation: StateFlow<Conversation?> = _conversation
+
+    fun loadConversation(conversationId: String) {
+        viewModelScope.launch {
+            val response =
+                ApiClient.apiService.getConversation(conversationId)
+
+            _conversation.value = response.conversation
+        }
+    }
+}
 
 data class Participants(
     val id: String,

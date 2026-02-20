@@ -40,6 +40,7 @@ import com.sauban.securemessenger.helper.LoginRequest
 import com.sauban.securemessenger.helper.UserSession
 import com.sauban.securemessenger.helper.storeToken
 import com.sauban.securemessenger.network.ApiClient
+import com.sauban.securemessenger.network.SocketManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,7 +129,12 @@ fun HomeScreen(navController: NavController) {
                             storeToken(context, response.token)
                             // Also set in ApiClient so all future calls use it automatically
                             ApiClient.setToken(response.token)
-                            UserSession.saveUser(this as Context, response.user.id, response.user.name, response.user.phoneNumber)
+                            SocketManager.init(token = response.token)
+                            UserSession.saveUser(context, response.user.id, response.user.name, response.user.phoneNumber)
+                            CryptoManager.generateIdentityKeyIfNeeded()
+                            SocketManager.registerPublicKey(
+                                CryptoManager.getPublicKeyBase64()
+                            )
                             navController.navigate("ConversationScreen")
                         } catch (e: Exception) {
                             snackBarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")

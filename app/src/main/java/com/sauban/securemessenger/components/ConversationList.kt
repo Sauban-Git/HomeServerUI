@@ -5,11 +5,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import com.sauban.securemessenger.helper.User
 import com.sauban.securemessenger.model.Conversation
 
 @Composable
 fun ConversationList(
+    navController: NavController,
     conversations: List<Conversation>,
     paddingValues: PaddingValues,
     snackBarHostState: SnackbarHostState,
@@ -27,6 +29,7 @@ fun ConversationList(
             key = { it.id }, // prevents recomposition issues
         ) { conversation ->
             ConversationItem(
+                navController = navController,
                 conversation = conversation,
                 snackBarHostState = snackBarHostState,
             )

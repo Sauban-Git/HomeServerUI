@@ -12,14 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.sauban.securemessenger.helper.User
 import com.sauban.securemessenger.helper.UserSession
 import com.sauban.securemessenger.model.Conversation
 import com.sauban.securemessenger.network.SocketManager
+import com.sauban.securemessenger.screens.ChatScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun ConversationItem(conversation: Conversation, snackBarHostState: SnackbarHostState) {
+fun ConversationItem(conversation: Conversation, snackBarHostState: SnackbarHostState, navController: NavController) {
 //    val timeText = remember(conversation.lastMessageTime) {
 //        formatTime(conversation.lastMessageTime)
 //    }
@@ -36,6 +38,7 @@ fun ConversationItem(conversation: Conversation, snackBarHostState: SnackbarHost
     Row(
         modifier = Modifier
             .clickable {
+                navController.navigate("chat/${conversation.id}")
                 // Show snackBar with conversation ID
                 scope.launch {
                     snackBarHostState.showSnackbar(

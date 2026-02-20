@@ -1,5 +1,6 @@
 package com.sauban.securemessenger.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,50 +9,75 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sauban.securemessenger.helper.CryptoManager
+import com.sauban.securemessenger.helper.UserSession
 import com.sauban.securemessenger.helper.getToken
 import com.sauban.securemessenger.model.ChatMessage
+import com.sauban.securemessenger.model.ChatViewModel
+import com.sauban.securemessenger.model.Conversation
 import com.sauban.securemessenger.network.SocketManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen() {
+fun ChatScreen(conversationId: String, viewModel: ChatViewModel = viewModel()) {
 
     var inputText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
     val context = LocalContext.current
+    UserSession.loadUser(context)
+    val conversation by viewModel.conversation.collectAsState()
 
-    val roomId = "room101"
-    val peerUserId = "ca108c28-e468-430c-9776-eb04bcba21b8" // TODO: dynamic later
-    val token = getToken(context) ?: ""
+    LaunchedEffect(conversationId) {
+        viewModel.loadConversation(conversationId)
+    }
+
+    if (conversation == null) {
+        CircularProgressIndicator()
+        return
+    }
 
     var sessionKey by remember { mutableStateOf<ByteArray?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(conversation) {
 
         // 1️⃣ Generate identity key once
-        CryptoManager.generateIdentityKeyIfNeeded()
 
         // 2️⃣ Connect socket
-        SocketManager.init(token)
+
 
         // 3️⃣ Join room
 //        SocketManager.joinRoom(roomId)
 
         // 4️⃣ Register public key
-        SocketManager.registerPublicKey(
-            CryptoManager.getPublicKeyBase64()
-        )
+
 
         // 5️⃣ Fetch peer public key and derive session key
-//        SocketManager.getPublicKey(peerUserId) { peerKey ->
-//
-//            val sharedSecret =
-//                CryptoManager.deriveSharedSecret(peerKey)
-//
-//            sessionKey =
-//                CryptoManager.hkdf(sharedSecret)
-//        }
+
+        if (conversation == null) return@LaunchedEffect
+        SocketManager.joinRoom(conversation!!.id)
+
+        val peerUserId = conversation!!.participants
+            .firstOrNull { it.user.id != UserSession.userId }
+            ?.user?.id ?: return@LaunchedEffect
+
+        SocketManager.getPublicKey(peerUserId) { peerKey ->
+            if (peerKey == null) {
+                Log.e("E2EE", "Public key not found")
+                return@getPublicKey
+            }
+
+            try {
+                val sharedSecret =
+                    CryptoManager.deriveSharedSecret(peerKey)
+
+                sessionKey =
+                    CryptoManager.hkdf(sharedSecret)
+
+            } catch (e: Exception) {
+                Log.e("E2EE", "Key derivation failed", e)
+            }
+        }
 
         // 6️⃣ Listen for new messages
 //        SocketManager.onNewMessage { payload ->
@@ -75,13 +101,13 @@ fun ChatScreen() {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Person B") })
-        }
+        },
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
 
             LazyColumn(
@@ -113,22 +139,22 @@ fun ChatScreen() {
                             val (encryptedMsg, iv) =
                                 CryptoManager.encryptMessage(
                                     sessionKey!!,
-                                    inputText
+                                    inputText,
                                 )
 
                             SocketManager.sendMessage(
-                                roomId,
+                                conversationId,
                                 encryptedMsg,
-                                iv
+                                iv,
                             )
 
                             messages.add(
-                                ChatMessage(inputText, isMine = true)
+                                ChatMessage(inputText, isMine = true),
                             )
 
                             inputText = ""
                         }
-                    }
+                    },
                 ) {
                     Text("Send")
                 }

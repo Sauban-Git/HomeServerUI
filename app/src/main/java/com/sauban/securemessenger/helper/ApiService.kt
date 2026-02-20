@@ -4,6 +4,7 @@ import com.sauban.securemessenger.model.Conversation
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 data class LoginRequest(val phoneNumber: String, val password: String, val publicKey: String)
 data class SignupRequest(val phoneNumber: String, val password: String, val name: String)
@@ -16,6 +17,9 @@ data class UserResponse(val id: String, val name: String, val phoneNumber: Strin
 data class UpdateRequest(val name: String)
 data class ConversationsResponse(
     val conversations: List<Conversation>
+)
+data class ConversationResponse(
+    val conversation: Conversation
 )
 
 
@@ -32,6 +36,10 @@ interface ApiService {
     @GET("user")
     suspend fun getUser(): UsersResponse
 
+    @GET("conversation/{conversationId}")
+    suspend fun getConversation(
+        @Path("conversationId") conversationId: String
+    ): ConversationResponse
     @GET("conversation")
     suspend fun getConversations(): ConversationsResponse
 
