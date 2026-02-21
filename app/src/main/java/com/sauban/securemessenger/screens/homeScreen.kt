@@ -120,6 +120,12 @@ fun HomeScreen(navController: NavController) {
 
             Button(
                 onClick = {
+                    if(phoneNumber.length < 10 || password.length < 5) {
+                        scope.launch {
+                            snackBarHostState.showSnackbar("Invalid Number or weak password!")
+                        }
+                        return@Button
+                    }
 
                     scope.launch {
                         try {
@@ -135,7 +141,9 @@ fun HomeScreen(navController: NavController) {
                             SocketManager.registerPublicKey(
                                 CryptoManager.getPublicKeyBase64()
                             )
-                            navController.navigate("ConversationScreen")
+                            navController.navigate("ConversationScreen") {
+                                popUpTo("Home") { inclusive = true }
+                            }
                         } catch (e: Exception) {
                             snackBarHostState.showSnackbar("Login failed: ${e.message ?: "Unknown error"}")
                         }
@@ -143,11 +151,13 @@ fun HomeScreen(navController: NavController) {
 
                 },
             ) {
-                Text("Click!")
+                Text("Login")
             }
             Button(
                 onClick = {
-                    navController.navigate("SignupScreen")
+                    navController.navigate("SignupScreen") {
+                        popUpTo("Home") { inclusive = true }
+                    }
                 }
             ) {
                 Text("New here? Signup")

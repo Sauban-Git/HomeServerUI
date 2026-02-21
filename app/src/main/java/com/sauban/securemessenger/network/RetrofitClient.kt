@@ -14,6 +14,10 @@ object ApiClient {
         authToken = token
     }
 
+    fun clearToken() {
+        authToken = null
+    }
+
     private val client = OkHttpClient.Builder()
         .addInterceptor { chain: Interceptor.Chain ->
             val request = chain.request().newBuilder()

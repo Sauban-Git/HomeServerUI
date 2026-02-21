@@ -3,7 +3,13 @@ package com.sauban.securemessenger.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -16,18 +22,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.sauban.securemessenger.components.ConversationList
 import com.sauban.securemessenger.components.UsersList
 import com.sauban.securemessenger.helper.User
+import com.sauban.securemessenger.helper.clearToken
 import com.sauban.securemessenger.model.Conversation
 import com.sauban.securemessenger.network.ApiClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(navController: NavController) {
-
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
     var conversations by remember { mutableStateOf<List<Conversation>>(emptyList()) }
     var users by remember { mutableStateOf<List<User>>(emptyList()) }
     val snackBarHostState = remember { SnackbarHostState() }
@@ -45,7 +54,41 @@ fun ConversationScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Secure Messenger") }
+                title = { Text("Secure Messenger") },
+                actions = {
+
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                expanded = false
+                                clearToken(context)
+                                ApiClient.clearToken()
+
+                                navController.navigate("SignupScreen") {
+                                    popUpTo(0)
+                                }
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = {
+                                expanded = false
+                            }
+                        )
+                    }
+                }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }

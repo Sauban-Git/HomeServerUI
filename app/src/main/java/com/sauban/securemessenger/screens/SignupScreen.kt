@@ -128,7 +128,9 @@ fun SignupScreen(navController: NavController) {
                             val response =
                                 ApiClient.apiService.signup(SignupRequest(phoneNumber, password, name))
                             if (response.user != null) {
-                                navController.navigate("Home")
+                                navController.navigate("Home") {
+                                    popUpTo("SignupScreen") { inclusive = true }
+                                }
                             } else {
                                 snackbarHostState.showSnackbar("SignUp failed! Try again later")
                             }
@@ -143,7 +145,9 @@ fun SignupScreen(navController: NavController) {
             }
             Button(
                 onClick = {
-                    navController.navigate("Home")
+                    navController.navigate("Home") {
+                        popUpTo("SignupScreen") { inclusive = true }
+                    }
                 }
             ) {
                 Text("Already registered? Login")

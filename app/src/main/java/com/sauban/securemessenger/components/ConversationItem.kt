@@ -38,7 +38,9 @@ fun ConversationItem(conversation: Conversation, snackBarHostState: SnackbarHost
     Row(
         modifier = Modifier
             .clickable {
-                navController.navigate("chat/${conversation.id}")
+                navController.navigate("chat/${conversation.id}") {
+                    launchSingleTop = true
+                }
                 // Show snackBar with conversation ID
                 scope.launch {
                     snackBarHostState.showSnackbar(
